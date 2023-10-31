@@ -3,6 +3,24 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Contact, Customer
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)  # Set the desired log level
+logger = logging.getLogger(__name__)  # Create a logger
+
+# Define a custom log format
+log_formatter = logging.Formatter("%(asctime)s [%(name)s] [%(levelname)s] - %(message)s")
+
+# Create a file handler to log to a file
+file_handler = logging.FileHandler("app.log")
+file_handler.setFormatter(log_formatter)
+logger.addHandler(file_handler)
+
+# Optionally,  create a stream handler to log to the console
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(log_formatter)
+logger.addHandler(console_handler)
 
 router = APIRouter()
 
@@ -57,4 +75,5 @@ def delete_contact(contact_id: int, db: Session = Depends(get_db)):
     
     db.delete(existing_contact)
     db.commit()
+    logger.info("Request to delete contact")
     return {"message": "Contact deleted"}
